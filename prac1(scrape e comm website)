@@ -1,0 +1,49 @@
+from bs4 import BeautifulSoup
+import requests
+import mysql.connector
+mydb =mysql.connector.connect(host="localhost",user="root",password="system",database="product",a
+uth_plugin = 'mysql_native_password')
+mycursor = mydb.cursor()
+x='y'
+while (x=='y' or x=="Y"):
+try:
+
+URL = "https://www.amazon.in/Fire-Boltt-Bluetooth-Calling-Assistance-
+Resolution/dp/B0BF57RN3K/ref=sr_1_1?pd_rd_r=132b3f0f-626b-4b98-afbc-
+c3b6f193c3a5&pd_rd_w=TxdNk&pd_rd_wg=oZeTh&pf_rd_p=22a704c7-cdfe-40ab-ab4e-
+31cbf3ad0e01&pf_rd_r=DQ80CW83D44WM55T1DMR&qid=1678875410&sr=8-1"
+
+HEADERS = ({
+'User-Agent': 'Mozilla/5.0 (X11; Window x86_64) AppleWebKit / 537.36(KHTML, like
+Gecko) Chrome / 44.0.2403.157 Safari / 537.36',
+'Accept-Language': 'en-US, en;q=0.5'})
+webpage = requests.get(URL, headers=HEADERS)
+soup1 = BeautifulSoup(webpage.content, "html.parser")
+soup2 = BeautifulSoup(soup1.prettify(),"html.parser")
+title = soup2.find(id='productTitle').get_text()
+price = soup2.find('span',class_ ='a-price-whole').get_text().lstrip()
+price=price.replace("\n", "")
+price=price.replace(" ", "")
+price=price.replace(".", "")
+price=price.replace(",", "")
+
+rating = soup2.find('span', attrs={'class':'a-icon-alt'}).get_text().strip()
+rating=rating.replace("\n", "")
+
+mycursor.execute("INSERT INTO products (name, price) VALUES (%s, %s)", (title[0:35],
+int(price)))
+
+print("Successfull saved the following data in mysql")
+print("Name:",title[0:35])
+print("price:", price)
+print("rating:",rating)
+
+except:
+    print(Exception)
+finally:
+    x=input("do you wish to put more data y/n")
+mydb.commit()
+mydb.close()
+
+print(title)
+print(price)
