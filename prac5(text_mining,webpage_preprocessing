@@ -1,0 +1,48 @@
+#pip install beautifulsoup4
+#pip install nltk
+#pip install requests
+
+from bs4 import BeautifulSoup
+import requests
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
+
+# Download stopwords and initialize stemmer
+stop_words = set(stopwords.words('english'))
+stemmer = PorterStemmer()
+
+# Retrieve webpage content
+url = 'https://www.britannica.com/'
+response = requests.get(url)
+
+# Parse HTML and extract meta tags
+soup = BeautifulSoup(response.content, 'html.parser')
+meta_tags = soup.find_all('meta')
+
+# Extract meta information
+title = ''
+description = ''
+keywords = []
+
+for tag in meta_tags:
+    if tag.get('property')=='og:title':
+        title=tag.get('content')
+        if tag.get('property')=='og:description':
+            description=tag.get('content')
+            if tag.get('name')=='keywords':
+                keywords=tag.get('content')
+
+# Preprocess content
+content = soup.get_text()
+tokens = word_tokenize(content)
+filtered_tokens = [token.lower()for token in tokens if token.lower() not in stop_words]
+stemmed_tokens = [stemmer.stem(token) for token in filtered_tokens]
+preprocessed_content = ' '.join(stemmed_tokens)
+
+# Print results
+print('Title:', title)
+print('Description:', description)
+print('keywords:', keywords)
+print('Preprocessed content:', preprocessed_content[0:400])
