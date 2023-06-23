@@ -1,0 +1,19 @@
+#pip install requests
+import requests
+
+def local_crawler(location, keywords):
+    url =f'https://nominatim.openstreetmap.org/search.php?q={"+".join(keywords)}&format=json&addressdetails=1&limit=10&viewbox=&bounded=1&countrycodes='
+    response = requests.get(url)
+    if response.status_code == 200:
+        results = response.json()
+        for result in results:
+            name = result.get('display_name', 'Unknown')
+            address = ', '.join(filter(None, [result.get('address', {}).get('road'), result.get('address',{}).get('city'), result.get('address', {}).get('state')]))
+            print(f'{name}: {address}\n')
+        else:
+            print(f'Request failed with status code {response.status_code}')
+
+# Example usage
+location = 'Thane, India' # City and state abbreviation
+keywords = ['Hospital','Doctor','Thane']
+local_crawler(location, keywords)
