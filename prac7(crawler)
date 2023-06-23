@@ -1,0 +1,29 @@
+#pip install requests
+#pip install beautifulsoup4
+import requests
+from bs4 import BeautifulSoup
+
+def web_crawler(url, keywords):
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.content, 'html.parser')
+        page_text = soup.get_text()
+        for keyword in keywords:
+            if keyword.lower() in page_text.lower():
+                print(f'{keyword} found on {url}')
+            else:
+                print(f'{keyword} not found on {url}')
+        else:
+            print(f'Request failed with status code {response.status_code}')
+
+# Example usage
+url = input("Enter the URL to be searched") #e.g.https://timesofindia.indiatimes.com/
+keywords = []
+print("Enter the keywords to be searched");
+while(True):
+    k=input("Enter the keyword")
+    keywords.append(k)
+    x=int(input("Enter 1 to give more keyword, enter 0 to exit"))
+    if x==0:
+        break
+web_crawler(url, keywords)
